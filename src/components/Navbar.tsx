@@ -48,67 +48,83 @@ export function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-[#e5f1f2]">
-        <div className="max-w-[1120px] mx-auto px-4 lg:px-6 h-[60px] flex items-center justify-between relative">
-          {/* Left Navigation */}
-          <nav className="hidden lg:flex items-center gap-0 text-[12px] font-medium text-[#1e3a3e]">
+      <header className="fixed top-3 inset-x-0 z-40 px-3 sm:px-5 pointer-events-none">
+        <div className="pointer-events-auto nav-glass-pill max-w-[1080px] mx-auto px-3 lg:px-4 h-[60px] rounded-full flex items-center justify-between relative">
+          {/* Left Navigation Buttons inside Transparent Glass Pill */}
+          <nav className="hidden lg:flex items-center gap-0.5 text-[11px] font-medium text-white/85">
             <Link
               to="/"
-              className={`group relative h-[60px] px-1.5 inline-flex items-center whitespace-nowrap shrink-0 transition-colors ${
-                isActive('/') ? 'text-[#F5A623] font-semibold' : 'hover:text-[#094B53]'
-              }`}
+              className="group relative h-[60px] px-0.5 inline-flex items-center justify-center whitespace-nowrap shrink-0 cursor-pointer select-none active:scale-95 transition-transform"
             >
-              <span className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <span className="nav-spotlight-bar absolute top-0 left-1/2 -translate-x-1/2 w-5 h-[2.5px] rounded-b-full" />
+              <span className="pointer-events-none absolute inset-0 overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <span className="nav-spotlight-bar absolute top-0 left-1/2 -translate-x-1/2 w-6 h-[3px] rounded-b-full" />
                 <span className="nav-spotlight-beam absolute inset-0" />
               </span>
-              <span className="relative z-10">Home</span>
+              <span
+                className={`relative z-10 px-2 py-1 rounded-full border transition-all duration-200 ${
+                  isActive('/')
+                    ? 'bg-[#2dd4bf]/20 border-[#5eead4]/60 text-[#7fffe8] font-semibold shadow-[0_0_12px_rgba(45,212,191,0.3)]'
+                    : 'bg-white/[0.06] border-white/15 text-white/85 group-hover:bg-[#5eead4]/15 group-hover:border-[#7fffe8]/55 group-hover:text-white group-hover:shadow-[0_0_12px_rgba(94,234,212,0.35)]'
+                }`}
+              >
+                Home
+              </span>
             </Link>
 
             <Link
               to="/about"
-              className={`group relative h-[60px] px-1.5 inline-flex items-center whitespace-nowrap shrink-0 transition-colors ${
-                isActive('/about') ? 'text-[#F5A623] font-semibold' : 'hover:text-[#094B53]'
-              }`}
+              className="group relative h-[60px] px-0.5 inline-flex items-center justify-center whitespace-nowrap shrink-0 cursor-pointer select-none active:scale-95 transition-transform"
             >
-              <span className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <span className="nav-spotlight-bar absolute top-0 left-1/2 -translate-x-1/2 w-5 h-[2.5px] rounded-b-full" />
+              <span className="pointer-events-none absolute inset-0 overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <span className="nav-spotlight-bar absolute top-0 left-1/2 -translate-x-1/2 w-6 h-[3px] rounded-b-full" />
                 <span className="nav-spotlight-beam absolute inset-0" />
               </span>
-              <span className="relative z-10">About</span>
+              <span
+                className={`relative z-10 px-2 py-1 rounded-full border transition-all duration-200 ${
+                  isActive('/about')
+                    ? 'bg-[#2dd4bf]/20 border-[#5eead4]/60 text-[#7fffe8] font-semibold shadow-[0_0_12px_rgba(45,212,191,0.3)]'
+                    : 'bg-white/[0.06] border-white/15 text-white/85 group-hover:bg-[#5eead4]/15 group-hover:border-[#7fffe8]/55 group-hover:text-white group-hover:shadow-[0_0_12px_rgba(94,234,212,0.35)]'
+                }`}
+              >
+                About
+              </span>
             </Link>
 
-            {/* Pages Dropdown */}
+            {/* Pages Dropdown Button */}
             <div
-              className="group relative h-[60px] flex items-center"
+              className="group relative h-[60px] px-0.5 flex items-center"
               onMouseEnter={() => setOpenMenu('pages')}
               onMouseLeave={() => setOpenMenu(null)}
             >
-              <span className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <span className="nav-spotlight-bar absolute top-0 left-1/2 -translate-x-1/2 w-5 h-[2.5px] rounded-b-full" />
+              <span className="pointer-events-none absolute inset-0 overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <span className="nav-spotlight-bar absolute top-0 left-1/2 -translate-x-1/2 w-6 h-[3px] rounded-b-full" />
                 <span className="nav-spotlight-beam absolute inset-0" />
               </span>
               <button
                 type="button"
                 onClick={() => setOpenMenu(openMenu === 'pages' ? null : 'pages')}
-                className={`relative z-10 inline-flex items-center gap-0.5 whitespace-nowrap shrink-0 px-1.5 h-full transition-colors cursor-pointer ${
-                  ['/services', '/pricing', '/faq', '/gallery', '/guides', '/testimonials'].some((p) =>
-                    pathname.startsWith(p),
-                  )
-                    ? 'text-[#F5A623] font-semibold'
-                    : 'group-hover:text-[#094B53]'
-                }`}
+                className="relative z-10 inline-flex items-center justify-center whitespace-nowrap shrink-0 h-full cursor-pointer select-none active:scale-95 transition-transform"
               >
-                Pages <ChevronDown className="w-3 h-3" />
+                <span
+                  className={`inline-flex items-center gap-0.5 px-2 py-1 rounded-full border transition-all duration-200 ${
+                    ['/services', '/pricing', '/faq', '/gallery', '/guides', '/testimonials'].some((p) =>
+                      pathname.startsWith(p),
+                    )
+                      ? 'bg-[#2dd4bf]/20 border-[#5eead4]/60 text-[#7fffe8] font-semibold shadow-[0_0_12px_rgba(45,212,191,0.3)]'
+                      : 'bg-white/[0.06] border-white/15 text-white/85 group-hover:bg-[#5eead4]/15 group-hover:border-[#7fffe8]/55 group-hover:text-white group-hover:shadow-[0_0_12px_rgba(94,234,212,0.35)]'
+                  }`}
+                >
+                  Pages <ChevronDown className="w-3 h-3" />
+                </span>
               </button>
               {openMenu === 'pages' && (
-                <div className="absolute left-0 top-full w-48 bg-white rounded-xl shadow-xl border border-[#d7ebee] py-1.5 z-50">
+                <div className="absolute left-0 top-[calc(100%+6px)] w-48 bg-[#073d44]/95 backdrop-blur-md rounded-2xl shadow-2xl border border-white/20 py-1.5 z-50">
                   {DROPDOWN_MENUS.pages.map((item) => (
                     <Link
                       key={item.to}
                       to={item.to}
                       onClick={() => setOpenMenu(null)}
-                      className="block px-3.5 py-1.5 text-[12.5px] text-[#183135] hover:bg-[#eef7f8] hover:text-[#094b53] transition-colors"
+                      className="block px-3.5 py-1.5 text-[12px] text-white/85 hover:bg-white/10 hover:text-[#7fffe8] transition-colors"
                     >
                       {item.label}
                     </Link>
@@ -117,33 +133,39 @@ export function Navbar() {
               )}
             </div>
 
-            {/* Destination Dropdown */}
+            {/* Destination Dropdown Button */}
             <div
-              className="group relative h-[60px] flex items-center"
+              className="group relative h-[60px] px-0.5 flex items-center"
               onMouseEnter={() => setOpenMenu('destination')}
               onMouseLeave={() => setOpenMenu(null)}
             >
-              <span className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <span className="nav-spotlight-bar absolute top-0 left-1/2 -translate-x-1/2 w-5 h-[2.5px] rounded-b-full" />
+              <span className="pointer-events-none absolute inset-0 overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <span className="nav-spotlight-bar absolute top-0 left-1/2 -translate-x-1/2 w-6 h-[3px] rounded-b-full" />
                 <span className="nav-spotlight-beam absolute inset-0" />
               </span>
               <button
                 type="button"
                 onClick={() => setOpenMenu(openMenu === 'destination' ? null : 'destination')}
-                className={`relative z-10 inline-flex items-center gap-0.5 whitespace-nowrap shrink-0 px-1.5 h-full transition-colors cursor-pointer ${
-                  isActive('/destinations') ? 'text-[#F5A623] font-semibold' : 'group-hover:text-[#094B53]'
-                }`}
+                className="relative z-10 inline-flex items-center justify-center whitespace-nowrap shrink-0 h-full cursor-pointer select-none active:scale-95 transition-transform"
               >
-                Destination <ChevronDown className="w-3 h-3" />
+                <span
+                  className={`inline-flex items-center gap-0.5 px-2 py-1 rounded-full border transition-all duration-200 ${
+                    isActive('/destinations')
+                      ? 'bg-[#2dd4bf]/20 border-[#5eead4]/60 text-[#7fffe8] font-semibold shadow-[0_0_12px_rgba(45,212,191,0.3)]'
+                      : 'bg-white/[0.06] border-white/15 text-white/85 group-hover:bg-[#5eead4]/15 group-hover:border-[#7fffe8]/55 group-hover:text-white group-hover:shadow-[0_0_12px_rgba(94,234,212,0.35)]'
+                  }`}
+                >
+                  Destination <ChevronDown className="w-3 h-3" />
+                </span>
               </button>
               {openMenu === 'destination' && (
-                <div className="absolute left-0 top-full w-44 bg-white rounded-xl shadow-xl border border-[#d7ebee] py-1.5 z-50">
+                <div className="absolute left-0 top-[calc(100%+6px)] w-44 bg-[#073d44]/95 backdrop-blur-md rounded-2xl shadow-2xl border border-white/20 py-1.5 z-50">
                   {DROPDOWN_MENUS.destination.map((item) => (
                     <Link
                       key={item.to}
                       to={item.to}
                       onClick={() => setOpenMenu(null)}
-                      className="block px-3.5 py-1.5 text-[12.5px] text-[#183135] hover:bg-[#eef7f8] hover:text-[#094b53]"
+                      className="block px-3.5 py-1.5 text-[12px] text-white/85 hover:bg-white/10 hover:text-[#7fffe8] transition-colors"
                     >
                       {item.label}
                     </Link>
@@ -152,33 +174,39 @@ export function Navbar() {
               )}
             </div>
 
-            {/* Tour Dropdown */}
+            {/* Tour Dropdown Button */}
             <div
-              className="group relative h-[60px] flex items-center"
+              className="group relative h-[60px] px-0.5 flex items-center"
               onMouseEnter={() => setOpenMenu('tour')}
               onMouseLeave={() => setOpenMenu(null)}
             >
-              <span className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <span className="nav-spotlight-bar absolute top-0 left-1/2 -translate-x-1/2 w-5 h-[2.5px] rounded-b-full" />
+              <span className="pointer-events-none absolute inset-0 overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <span className="nav-spotlight-bar absolute top-0 left-1/2 -translate-x-1/2 w-6 h-[3px] rounded-b-full" />
                 <span className="nav-spotlight-beam absolute inset-0" />
               </span>
               <button
                 type="button"
                 onClick={() => setOpenMenu(openMenu === 'tour' ? null : 'tour')}
-                className={`relative z-10 inline-flex items-center gap-0.5 whitespace-nowrap shrink-0 px-1.5 h-full transition-colors cursor-pointer ${
-                  isActive('/tours') ? 'text-[#F5A623] font-semibold' : 'group-hover:text-[#094B53]'
-                }`}
+                className="relative z-10 inline-flex items-center justify-center whitespace-nowrap shrink-0 h-full cursor-pointer select-none active:scale-95 transition-transform"
               >
-                Tour <ChevronDown className="w-3 h-3" />
+                <span
+                  className={`inline-flex items-center gap-0.5 px-2 py-1 rounded-full border transition-all duration-200 ${
+                    isActive('/tours')
+                      ? 'bg-[#2dd4bf]/20 border-[#5eead4]/60 text-[#7fffe8] font-semibold shadow-[0_0_12px_rgba(45,212,191,0.3)]'
+                      : 'bg-white/[0.06] border-white/15 text-white/85 group-hover:bg-[#5eead4]/15 group-hover:border-[#7fffe8]/55 group-hover:text-white group-hover:shadow-[0_0_12px_rgba(94,234,212,0.35)]'
+                  }`}
+                >
+                  Tour <ChevronDown className="w-3 h-3" />
+                </span>
               </button>
               {openMenu === 'tour' && (
-                <div className="absolute left-0 top-full w-40 bg-white rounded-xl shadow-xl border border-[#d7ebee] py-1.5 z-50">
+                <div className="absolute left-0 top-[calc(100%+6px)] w-40 bg-[#073d44]/95 backdrop-blur-md rounded-2xl shadow-2xl border border-white/20 py-1.5 z-50">
                   {DROPDOWN_MENUS.tour.map((item) => (
                     <Link
                       key={item.to}
                       to={item.to}
                       onClick={() => setOpenMenu(null)}
-                      className="block px-3.5 py-1.5 text-[12.5px] text-[#183135] hover:bg-[#eef7f8] hover:text-[#094b53]"
+                      className="block px-3.5 py-1.5 text-[12px] text-white/85 hover:bg-white/10 hover:text-[#7fffe8] transition-colors"
                     >
                       {item.label}
                     </Link>
@@ -187,33 +215,39 @@ export function Navbar() {
               )}
             </div>
 
-            {/* Blog Dropdown */}
+            {/* Blog Dropdown Button */}
             <div
-              className="group relative h-[60px] flex items-center"
+              className="group relative h-[60px] px-0.5 flex items-center"
               onMouseEnter={() => setOpenMenu('blog')}
               onMouseLeave={() => setOpenMenu(null)}
             >
-              <span className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <span className="nav-spotlight-bar absolute top-0 left-1/2 -translate-x-1/2 w-5 h-[2.5px] rounded-b-full" />
+              <span className="pointer-events-none absolute inset-0 overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <span className="nav-spotlight-bar absolute top-0 left-1/2 -translate-x-1/2 w-6 h-[3px] rounded-b-full" />
                 <span className="nav-spotlight-beam absolute inset-0" />
               </span>
               <button
                 type="button"
                 onClick={() => setOpenMenu(openMenu === 'blog' ? null : 'blog')}
-                className={`relative z-10 inline-flex items-center gap-0.5 whitespace-nowrap shrink-0 px-1.5 h-full transition-colors cursor-pointer ${
-                  isActive('/blog') ? 'text-[#F5A623] font-semibold' : 'group-hover:text-[#094B53]'
-                }`}
+                className="relative z-10 inline-flex items-center justify-center whitespace-nowrap shrink-0 h-full cursor-pointer select-none active:scale-95 transition-transform"
               >
-                Blog <ChevronDown className="w-3 h-3" />
+                <span
+                  className={`inline-flex items-center gap-0.5 px-2 py-1 rounded-full border transition-all duration-200 ${
+                    isActive('/blog')
+                      ? 'bg-[#2dd4bf]/20 border-[#5eead4]/60 text-[#7fffe8] font-semibold shadow-[0_0_12px_rgba(45,212,191,0.3)]'
+                      : 'bg-white/[0.06] border-white/15 text-white/85 group-hover:bg-[#5eead4]/15 group-hover:border-[#7fffe8]/55 group-hover:text-white group-hover:shadow-[0_0_12px_rgba(94,234,212,0.35)]'
+                  }`}
+                >
+                  Blog <ChevronDown className="w-3 h-3" />
+                </span>
               </button>
               {openMenu === 'blog' && (
-                <div className="absolute left-0 top-full w-40 bg-white rounded-xl shadow-xl border border-[#d7ebee] py-1.5 z-50">
+                <div className="absolute left-0 top-[calc(100%+6px)] w-40 bg-[#073d44]/95 backdrop-blur-md rounded-2xl shadow-2xl border border-white/20 py-1.5 z-50">
                   {DROPDOWN_MENUS.blog.map((item) => (
                     <Link
                       key={item.to}
                       to={item.to}
                       onClick={() => setOpenMenu(null)}
-                      className="block px-3.5 py-1.5 text-[12.5px] text-[#183135] hover:bg-[#eef7f8] hover:text-[#094b53]"
+                      className="block px-3.5 py-1.5 text-[12px] text-white/85 hover:bg-white/10 hover:text-[#7fffe8] transition-colors"
                     >
                       {item.label}
                     </Link>
@@ -224,15 +258,21 @@ export function Navbar() {
 
             <Link
               to="/contact"
-              className={`group relative h-[60px] px-1.5 inline-flex items-center whitespace-nowrap shrink-0 transition-colors ${
-                isActive('/contact') ? 'text-[#F5A623] font-semibold' : 'hover:text-[#094B53]'
-              }`}
+              className="group relative h-[60px] px-0.5 inline-flex items-center justify-center whitespace-nowrap shrink-0 cursor-pointer select-none active:scale-95 transition-transform"
             >
-              <span className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <span className="nav-spotlight-bar absolute top-0 left-1/2 -translate-x-1/2 w-5 h-[2.5px] rounded-b-full" />
+              <span className="pointer-events-none absolute inset-0 overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <span className="nav-spotlight-bar absolute top-0 left-1/2 -translate-x-1/2 w-6 h-[3px] rounded-b-full" />
                 <span className="nav-spotlight-beam absolute inset-0" />
               </span>
-              <span className="relative z-10">Contact</span>
+              <span
+                className={`relative z-10 px-2 py-1 rounded-full border transition-all duration-200 ${
+                  isActive('/contact')
+                    ? 'bg-[#2dd4bf]/20 border-[#5eead4]/60 text-[#7fffe8] font-semibold shadow-[0_0_12px_rgba(45,212,191,0.3)]'
+                    : 'bg-white/[0.06] border-white/15 text-white/85 group-hover:bg-[#5eead4]/15 group-hover:border-[#7fffe8]/55 group-hover:text-white group-hover:shadow-[0_0_12px_rgba(94,234,212,0.35)]'
+                }`}
+              >
+                Contact
+              </span>
             </Link>
           </nav>
 
@@ -242,23 +282,23 @@ export function Navbar() {
               type="button"
               onClick={() => setDrawerOpen(true)}
               aria-label="Open menu"
-              className="p-2 rounded-lg text-[#094B53] hover:bg-[#eef7f8]"
+              className="p-2 rounded-full text-white hover:bg-white/15 transition-colors cursor-pointer"
             >
-              <Menu className="w-5 h-5" />
+              <Menu className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Center Scalloped Brand Crest */}
+          {/* Center Brand Crest inside Glass Pill */}
           <Link
             to="/"
-            className="lg:absolute lg:left-1/2 lg:-translate-x-1/2 lg:top-0.5 bg-white px-5 pt-1.5 pb-2 rounded-b-[32px] shadow-[0_6px_16px_rgba(9,75,83,0.08)] flex items-center justify-center z-50"
+            className="lg:absolute lg:left-1/2 lg:-translate-x-1/2 flex items-center justify-center z-20 px-2"
           >
-            <TravllaLogo variant="light" compact />
+            <TravllaLogo variant="dark" compact />
           </Link>
 
-          {/* Right Socials + Utility */}
-          <div className="flex items-center gap-3 text-[#094B53]">
-            <div className="hidden md:flex items-center gap-2.5 text-[12px]">
+          {/* Right Socials + Utility Glass Buttons */}
+          <div className="flex items-center gap-2 text-white/85">
+            <div className="hidden md:flex items-center gap-1.5 text-[11px]">
               <a
                 href="#social-facebook"
                 onClick={(e) => {
@@ -266,7 +306,7 @@ export function Navbar() {
                   navigate('/gallery');
                 }}
                 aria-label="Facebook"
-                className="hover:text-[#F5A623] transition-colors"
+                className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-white/15 hover:text-[#7fffe8] transition-all"
               >
                 <Facebook className="w-3.5 h-3.5" />
               </a>
@@ -277,7 +317,7 @@ export function Navbar() {
                   navigate('/gallery');
                 }}
                 aria-label="Instagram"
-                className="hover:text-[#F5A623] transition-colors"
+                className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-white/15 hover:text-[#7fffe8] transition-all"
               >
                 <Instagram className="w-3.5 h-3.5" />
               </a>
@@ -288,7 +328,7 @@ export function Navbar() {
                   navigate('/about');
                 }}
                 aria-label="LinkedIn"
-                className="hover:text-[#F5A623] transition-colors"
+                className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-white/15 hover:text-[#7fffe8] transition-all"
               >
                 <Linkedin className="w-3.5 h-3.5" />
               </a>
@@ -299,17 +339,17 @@ export function Navbar() {
                   navigate('/blog');
                 }}
                 aria-label="X"
-                className="hover:text-[#F5A623] transition-colors font-bold text-[11px]"
+                className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-white/15 hover:text-[#7fffe8] transition-all font-bold text-[11px]"
               >
                 𝕏
               </a>
             </div>
-            <span className="hidden md:inline-block h-3.5 w-px bg-[#d7ebee]" />
+            <span className="hidden md:inline-block h-4 w-px bg-white/20" />
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
               aria-label="Search tours"
-              className="p-1 rounded-full hover:bg-[#eef7f8] transition-colors"
+              className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center text-white transition-all cursor-pointer"
             >
               <Search className="w-3.5 h-3.5" />
             </button>
@@ -317,9 +357,9 @@ export function Navbar() {
               type="button"
               onClick={() => setDrawerOpen(true)}
               aria-label="Open navigation drawer"
-              className="hidden lg:inline-flex p-1 rounded-lg hover:bg-[#eef7f8] transition-colors"
+              className="hidden lg:inline-flex w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 items-center justify-center text-white transition-all cursor-pointer"
             >
-              <Menu className="w-4 h-4" />
+              <Menu className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>

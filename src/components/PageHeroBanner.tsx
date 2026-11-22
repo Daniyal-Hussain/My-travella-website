@@ -52,7 +52,7 @@ export function PageHeroBanner({ title, breadcrumb }: PageHeroBannerProps) {
       </svg>
 
       {/* Centered Heading & Breadcrumb */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 -mt-4">
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 pt-10">
         <h1 className="font-display text-3xl md:text-[42px] font-extrabold tracking-tight text-[#094B53] uppercase">
           {title}
         </h1>

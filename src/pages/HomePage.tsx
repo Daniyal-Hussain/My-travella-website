@@ -144,7 +144,7 @@ export function HomePage() {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-[#094B53]/30 via-transparent to-[#094B53]/45" />
 
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 -mt-8">
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 pt-4">
           <span className="font-script text-2xl md:text-4xl font-bold text-[#8FE01E] drop-shadow-md">
             Explore The
           </span>

@@ -24,4 +24,6 @@ export const ASSETS = {
   wildlifeTiger: '/src/assets/images/wildlife_tiger_1795335155767.jpg',
   umbrellaTraveler: '/src/assets/images/traveler_umbrella_man_1795335155184.jpg',
   error404: '/src/assets/images/error_lost_traveler_1795335066431.jpg',
+  brandLogoDark: '/src/assets/images/brand-logo-dark.png',
+  brandLogoLight: '/src/assets/images/brand-logo-light.png',
 };
