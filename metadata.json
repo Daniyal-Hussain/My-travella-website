@@ -1,0 +1,6 @@
+{
+  "name": "Travlla — Luxury Travel & Tour Booking",
+  "description": "Explore iconic destinations, curated tour packages, local guides, travel services, pricing plans, and instant tour reservations built on the MERN stack.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
