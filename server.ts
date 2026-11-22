@@ -66,8 +66,33 @@ async function startServer() {
   if (!isProd) {
     const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: {
+        middlewareMode: true,
+        hmr: false,
+        ws: false,
+      },
       appType: 'custom',
+    });
+    // When HMR/WS is disabled, prevent Vite's @vite/client from opening a failing WebSocket
+    // while keeping updateStyle, removeStyle, createHotContext, ErrorOverlay, and injectQuery intact.
+    app.get('/@vite/client', async (req, res, next) => {
+      try {
+        const result = await vite.transformRequest(req.originalUrl || '/@vite/client');
+        if (!result) return next();
+        const patched = result.code.replace(
+          /createWebSocketModuleRunnerTransport\(\{[\s\S]*?pingInterval:\s*hmrTimeout\s*\}\)/g,
+          '({ async connect() {}, async disconnect() {}, send() {} })',
+        );
+        res
+          .status(200)
+          .set({
+            'Content-Type': 'application/javascript; charset=utf-8',
+            'Cache-Control': 'no-cache',
+          })
+          .end(patched);
+      } catch (err) {
+        next(err);
+      }
     });
     app.use(vite.middlewares);
     app.use(async (req, res, next) => {
