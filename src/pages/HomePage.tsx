@@ -1,6 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Calendar, Minus, Plus, Search, Star } from 'lucide-react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  Calendar,
+  Check,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  MapPin,
+  Minus,
+  Plus,
+  Search,
+  Star,
+} from 'lucide-react';
 import { api, type HomePayload, type PricingPlanDTO, type TourDTO } from '../lib/api';
 import { ASSETS } from '../lib/images';
 import { BookingModal } from '../components/BookingModal';
@@ -84,12 +97,44 @@ function TrendingFeatureIcon({ kind }: { kind: 'safety' | 'exclusive' | 'guide' 
   );
 }
 
+const DEFAULT_LOCATIONS = [
+  'Bali, Indonesia',
+  'Tokyo City, Japan',
+  'South Korea',
+  'Switzerland',
+  'Kashmir Valley',
+  'Paris, France',
+  'Maldives',
+  'Thailand',
+];
+
+const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const FULL_MONTH_NAMES = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
+
 export function HomePage() {
   const navigate = useNavigate();
   const [data, setData] = useState<HomePayload | null>(null);
   const [searchLoc, setSearchLoc] = useState('Bali, Indonesia');
   const [searchDate, setSearchDate] = useState('5 Sep 2025');
   const [travelers, setTravelers] = useState(2);
+  const [locDropdownOpen, setLocDropdownOpen] = useState(false);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [calendarMonth, setCalendarMonth] = useState(() => new Date(2025, 8, 1));
+  const [selectedDayKey, setSelectedDayKey] = useState('2025-8-5');
+  const searchBarRef = useRef<HTMLFormElement>(null);
   const [activeContinent, setActiveContinent] = useState<(typeof CONTINENTS)[number]>('Africa');
   const [tourOffset, setTourOffset] = useState(0);
   const [bookingTour, setBookingTour] = useState<{
@@ -104,9 +149,64 @@ export function HomePage() {
     api.getHome().then(setData).catch(() => {});
   }, []);
 
+  useEffect(() => {
+    const handleOutside = (e: MouseEvent) => {
+      if (searchBarRef.current && !searchBarRef.current.contains(e.target as Node)) {
+        setLocDropdownOpen(false);
+        setCalendarOpen(false);
+      }
+    };
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setLocDropdownOpen(false);
+        setCalendarOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutside);
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('mousedown', handleOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, []);
+
+  const locationOptions = useMemo(() => {
+    const set = new Set<string>(DEFAULT_LOCATIONS);
+    (data?.tours || []).forEach((t) => {
+      if (t.location) set.add(t.location);
+    });
+    (data?.destinations || []).forEach((d) => {
+      if (d.name) set.add(d.name);
+    });
+    return Array.from(set);
+  }, [data]);
+
+  const calendarDays = useMemo(() => {
+    const year = calendarMonth.getFullYear();
+    const month = calendarMonth.getMonth();
+    const firstWeekday = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const cells: Array<number | null> = [];
+    for (let i = 0; i < firstWeekday; i += 1) cells.push(null);
+    for (let d = 1; d <= daysInMonth; d += 1) cells.push(d);
+    return cells;
+  }, [calendarMonth]);
+
+  const handleSelectDate = (day: number) => {
+    const year = calendarMonth.getFullYear();
+    const month = calendarMonth.getMonth();
+    setSelectedDayKey(`${year}-${month}-${day}`);
+    setSearchDate(`${day} ${MONTH_NAMES[month]} ${year}`);
+    setCalendarOpen(false);
+  };
+
   const handleHeroSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate(`/tours?location=${encodeURIComponent(searchLoc)}&travelers=${travelers}`);
+    setLocDropdownOpen(false);
+    setCalendarOpen(false);
+    navigate(
+      `/tours?location=${encodeURIComponent(searchLoc)}&date=${encodeURIComponent(searchDate)}&travelers=${travelers}`,
+    );
   };
 
   const displayTrendingCards = TRENDING_SLIDES[activeContinent] || TRENDING_SLIDES.Africa;
@@ -136,15 +236,17 @@ export function HomePage() {
   return (
     <div>
       {/* HERO: Explore The MOUNTAINS */}
-      <section className="relative h-[400px] md:h-[475px] w-full overflow-hidden">
-        <img
-          src={ASSETS.heroMountains}
-          alt="Explore The Mountains"
-          className="w-full h-full object-cover object-center"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#094B53]/30 via-transparent to-[#094B53]/45" />
+      <section className="relative h-[400px] md:h-[475px] w-full">
+        <div className="absolute inset-0 overflow-hidden">
+          <img
+            src={ASSETS.heroMountains}
+            alt="Explore The Mountains"
+            className="w-full h-full object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#094B53]/30 via-transparent to-[#094B53]/45" />
+        </div>
 
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 pt-4">
+        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4 pt-4">
           <span className="font-script text-2xl md:text-4xl font-bold text-[#8FE01E] drop-shadow-md">
             Explore The
           </span>
@@ -155,42 +257,164 @@ export function HomePage() {
 
         {/* Floating Search Pill Bar */}
         <form
+          ref={searchBarRef}
           onSubmit={handleHeroSearch}
-          className="absolute bottom-4 left-1/2 -translate-x-1/2 w-[92%] max-w-[600px] bg-white rounded-full p-1.5 pl-5 shadow-2xl border border-[#e3f1f3] flex flex-wrap md:flex-nowrap items-center justify-between gap-2.5 z-20"
+          className="absolute bottom-0 translate-y-1/2 lg:translate-y-0 lg:bottom-4 left-1/2 -translate-x-1/2 w-[95%] max-w-[640px] bg-white rounded-full p-1.5 pl-3.5 sm:pl-5 shadow-2xl border border-[#e3f1f3] flex flex-nowrap items-center justify-between gap-2 sm:gap-3 z-30"
         >
-          <div className="flex-1 min-w-[120px] border-r border-[#eef5f6] pr-3">
-            <div className="text-[10px] font-bold text-[#094B53] uppercase tracking-wider">Location</div>
-            <input
-              type="text"
-              value={searchLoc}
-              onChange={(e) => setSearchLoc(e.target.value)}
-              className="w-full text-xs text-[#436065] font-medium focus:outline-none bg-transparent"
-            />
+          {/* Location Dropdown */}
+          <div className="relative flex-[1.25] min-w-0 border-r border-[#eef5f6] pr-2 sm:pr-3">
+            <div className="text-[9px] sm:text-[10px] font-bold text-[#094B53] uppercase tracking-wider leading-tight">
+              Location
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setLocDropdownOpen((prev) => !prev);
+                setCalendarOpen(false);
+              }}
+              aria-expanded={locDropdownOpen}
+              className="inline-flex items-center gap-1 max-w-full text-left text-[11px] sm:text-xs text-[#436065] font-medium focus:outline-none cursor-pointer mt-0.5"
+            >
+              <span className="inline-flex items-center gap-1 min-w-0">
+                <MapPin className="w-3 h-3 text-[#F5A623] shrink-0" />
+                <span className="truncate">{searchLoc}</span>
+              </span>
+              <ChevronDown
+                className={`w-3 h-3 text-[#094B53]/80 shrink-0 transition-transform duration-200 ${
+                  locDropdownOpen ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+
+            {locDropdownOpen && (
+              <div className="absolute bottom-[calc(100%+12px)] left-0 w-56 sm:w-64 bg-white rounded-2xl shadow-2xl border border-[#d7ebee] py-1.5 z-50 max-h-56 overflow-y-auto">
+                {locationOptions.map((loc) => {
+                  const selected = searchLoc === loc;
+                  return (
+                    <button
+                      key={loc}
+                      type="button"
+                      onClick={() => {
+                        setSearchLoc(loc);
+                        setLocDropdownOpen(false);
+                      }}
+                      className={`w-full px-3.5 py-2 text-left text-xs flex items-center justify-between gap-2 transition-colors cursor-pointer ${
+                        selected
+                          ? 'bg-[#eef7f8] text-[#094B53] font-semibold'
+                          : 'text-[#436065] hover:bg-[#f4fbfb] hover:text-[#094B53]'
+                      }`}
+                    >
+                      <span className="inline-flex items-center gap-2 truncate">
+                        <MapPin className="w-3.5 h-3.5 text-[#F5A623] shrink-0" />
+                        <span className="truncate">{loc}</span>
+                      </span>
+                      {selected && <Check className="w-3.5 h-3.5 text-[#84C400] shrink-0" />}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
-          <div className="flex-1 min-w-[105px] border-r border-[#eef5f6] pr-3">
-            <div className="text-[10px] font-bold text-[#094B53] uppercase tracking-wider">Date</div>
-            <input
-              type="text"
-              value={searchDate}
-              onChange={(e) => setSearchDate(e.target.value)}
-              className="w-full text-xs text-[#436065] font-medium focus:outline-none bg-transparent"
-            />
+
+          {/* Date Picker with Clickable Calendar */}
+          <div className="relative flex-1 min-w-0 border-r border-[#eef5f6] pr-2 sm:pr-3">
+            <div className="text-[9px] sm:text-[10px] font-bold text-[#094B53] uppercase tracking-wider leading-tight">
+              Date
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setCalendarOpen((prev) => !prev);
+                setLocDropdownOpen(false);
+              }}
+              aria-expanded={calendarOpen}
+              className="inline-flex items-center gap-1.5 max-w-full text-left text-[11px] sm:text-xs text-[#436065] font-medium focus:outline-none cursor-pointer mt-0.5"
+            >
+              <span className="truncate">{searchDate}</span>
+              <Calendar className="w-3.5 h-3.5 text-[#094B53] hover:text-[#F5A623] shrink-0 transition-colors" />
+            </button>
+
+            {calendarOpen && (
+              <div className="absolute bottom-[calc(100%+12px)] left-1/2 -translate-x-1/2 w-64 bg-white rounded-2xl shadow-2xl border border-[#d7ebee] p-3 z-50">
+                <div className="flex items-center justify-between mb-2.5">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setCalendarMonth(
+                        (prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1),
+                      )
+                    }
+                    aria-label="Previous month"
+                    className="w-7 h-7 rounded-full hover:bg-[#eef7f8] text-[#094B53] flex items-center justify-center cursor-pointer"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <span className="font-display font-bold text-xs text-[#094B53]">
+                    {FULL_MONTH_NAMES[calendarMonth.getMonth()]} {calendarMonth.getFullYear()}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setCalendarMonth(
+                        (prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1),
+                      )
+                    }
+                    aria-label="Next month"
+                    className="w-7 h-7 rounded-full hover:bg-[#eef7f8] text-[#094B53] flex items-center justify-center cursor-pointer"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-[#7c9498] mb-1">
+                  {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((wd) => (
+                    <div key={wd}>{wd}</div>
+                  ))}
+                </div>
+                <div className="grid grid-cols-7 gap-1 text-center">
+                  {calendarDays.map((day, idx) => {
+                    if (!day) return <div key={`empty-${idx}`} />;
+                    const key = `${calendarMonth.getFullYear()}-${calendarMonth.getMonth()}-${day}`;
+                    const active = selectedDayKey === key;
+                    return (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => handleSelectDate(day)}
+                        className={`h-7 rounded-full text-[11px] font-medium transition-colors cursor-pointer ${
+                          active
+                            ? 'bg-[#094B53] text-white font-bold shadow-sm'
+                            : 'text-[#183135] hover:bg-[#eef7f8] hover:text-[#094B53]'
+                        }`}
+                      >
+                        {day}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
-          <div className="flex items-center gap-3 pr-1">
+
+          {/* Traveler Stepper + Search CTA */}
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <div>
-              <div className="text-[10px] font-bold text-[#094B53] uppercase tracking-wider">Traveler</div>
-              <div className="flex items-center gap-2 text-xs font-bold text-[#183135]">
+              <div className="text-[9px] sm:text-[10px] font-bold text-[#094B53] uppercase tracking-wider leading-tight">
+                Traveler
+              </div>
+              <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-bold text-[#183135] mt-0.5">
                 <button
                   type="button"
                   onClick={() => setTravelers((v) => Math.max(1, v - 1))}
+                  aria-label="Decrease travelers"
                   className="hover:text-[#F5A623] cursor-pointer"
                 >
                   <Minus className="w-3 h-3" />
                 </button>
-                <span>{travelers}</span>
+                <span className="min-w-[12px] text-center">{travelers}</span>
                 <button
                   type="button"
                   onClick={() => setTravelers((v) => v + 1)}
+                  aria-label="Increase travelers"
                   className="hover:text-[#F5A623] cursor-pointer"
                 >
                   <Plus className="w-3 h-3" />
@@ -200,7 +424,7 @@ export function HomePage() {
             <button
               type="submit"
               aria-label="Search tours"
-              className="w-9 h-9 rounded-full bg-[#84C400] hover:bg-[#73ac00] text-white flex items-center justify-center shadow-md shrink-0 cursor-pointer"
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#84C400] hover:bg-[#73ac00] text-white flex items-center justify-center shadow-md shrink-0 cursor-pointer transition-colors"
             >
               <Search className="w-4 h-4" />
             </button>

@@ -99,7 +99,7 @@ export function EasyStepsSection() {
   ];
 
   return (
-    <section className="relative py-16 md:py-20 px-4 bg-white overflow-hidden">
+    <section className="relative pt-20 pb-14 lg:py-16 px-4 bg-white overflow-hidden">
       <div className="max-w-[1040px] mx-auto">
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-12">
           <div className="max-w-lg">
