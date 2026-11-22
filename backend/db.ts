@@ -27,7 +27,7 @@ export async function connectMongoDB(): Promise<{ uri: string; mode: 'external' 
     }
 
     memoryServer = await MongoMemoryServer.create();
-    const uri = memoryServer.getUri('travlla');
+    const uri = memoryServer.getUri('tournaure');
     await mongoose.connect(uri);
     return { uri, mode: 'embedded' as const };
   })().catch((err) => {

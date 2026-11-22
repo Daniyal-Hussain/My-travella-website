@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CheckCircle2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../lib/api';
@@ -13,6 +13,7 @@ interface BookingModalProps {
     activityType: string;
     pricePerDay: number;
     travelDate?: string;
+    travelers?: number;
   };
 }
 
@@ -21,10 +22,30 @@ export function BookingModal({ open, onClose, defaultTour }: BookingModalProps) 
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [travelDate, setTravelDate] = useState(defaultTour?.travelDate || '5 Sep 2025');
-  const [travelers, setTravelers] = useState(2);
+  const [travelers, setTravelers] = useState(defaultTour?.travelers || 2);
   const [specialRequests, setSpecialRequests] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [confirmedRef, setConfirmedRef] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (open) {
+      setConfirmedRef(null);
+      setTravelDate(defaultTour?.travelDate || '5 Sep 2025');
+      setTravelers(Math.max(1, defaultTour?.travelers || 2));
+    }
+  }, [open, defaultTour?.slug, defaultTour?.title, defaultTour?.travelDate, defaultTour?.travelers]);
+
+  useEffect(() => {
+    if (!open) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setConfirmedRef(null);
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [open, onClose]);
 
   if (!open) return null;
 
@@ -63,15 +84,25 @@ export function BookingModal({ open, onClose, defaultTour }: BookingModalProps) 
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#094B53]/70 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl max-w-lg w-full p-6 md:p-8 shadow-2xl border border-[#d7ebee] relative">
+    <div
+      onClick={() => {
+        setConfirmedRef(null);
+        onClose();
+      }}
+      className="fixed inset-0 z-50 bg-[#094B53]/70 backdrop-blur-sm flex items-center justify-center p-4"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="bg-white rounded-3xl max-w-lg w-full p-6 md:p-8 shadow-2xl border border-[#d7ebee] relative"
+      >
         <button
           type="button"
           onClick={() => {
             setConfirmedRef(null);
             onClose();
           }}
-          className="absolute right-5 top-5 p-1.5 rounded-full hover:bg-[#eef7f8] text-[#094B53]"
+          aria-label="Close booking modal"
+          className="absolute right-5 top-5 p-1.5 rounded-full hover:bg-[#eef7f8] text-[#094B53] cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>

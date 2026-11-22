@@ -255,12 +255,15 @@ export function TourFilterSidebar({
               className="w-full appearance-none border border-[#d7ebee] rounded-full px-4 py-2 text-xs text-[#183135] bg-white focus:outline-none"
             >
               <option value="All">All Locations</option>
-              <option value="Bali">Bali, Indonesia</option>
+              <option value="Bali, Indonesia">Bali, Indonesia</option>
               <option value="South Korea">South Korea</option>
-              <option value="Slovenia">Plateau in Slovenia</option>
-              <option value="Tokyo">Tokyo City Japan</option>
+              <option value="Plateau in Slovenia">Plateau in Slovenia</option>
+              <option value="Tokyo City, Japan">Tokyo City, Japan</option>
               <option value="Switzerland">Switzerland</option>
-              <option value="Kashmir">Kashmir Valley</option>
+              <option value="Kashmir Valley">Kashmir Valley</option>
+              <option value="Paris, France">Paris, France</option>
+              <option value="Maldives">Maldives</option>
+              <option value="Thailand">Thailand</option>
             </select>
             <ChevronDown className="w-3.5 h-3.5 text-[#5d7a7f] absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>

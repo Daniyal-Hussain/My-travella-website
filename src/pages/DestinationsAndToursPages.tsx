@@ -42,27 +42,44 @@ export function DestinationsPage() {
       <section className="py-14 px-4 bg-[#F6FCFC]">
         <div className="max-w-[1140px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {paged.map((dest) => (
-                <Link
-                  key={dest.slug}
-                  to={`/destinations/${dest.slug}`}
-                  className="group rounded-3xl overflow-hidden bg-[#094B53] border-4 border-[#094B53] shadow-md hover:-translate-y-1 transition-all"
+            {paged.length === 0 ? (
+              <div className="bg-white rounded-3xl border border-[#d7ebee] p-10 text-center space-y-3">
+                <p className="text-sm text-[#4a656a]">No destinations match your search.</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setQuery('');
+                    setTag('');
+                    setPage(1);
+                  }}
+                  className="bg-[#094B53] text-white text-xs font-semibold px-5 py-2 rounded-full cursor-pointer"
                 >
-                  <div className="h-56 overflow-hidden rounded-t-[20px]">
-                    <img
-                      src={dest.image}
-                      alt={dest.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
-                  <div className="py-3 text-center text-white">
-                    <div className="font-display font-bold text-base">{dest.name}</div>
-                    <div className="text-[11px] text-[#cce1e3]">{dest.listingCount} Listing</div>
-                  </div>
-                </Link>
-              ))}
-            </div>
+                  Show All Destinations
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {paged.map((dest) => (
+                  <Link
+                    key={dest.slug}
+                    to={`/destinations/${dest.slug}`}
+                    className="group rounded-3xl overflow-hidden bg-[#094B53] border-4 border-[#094B53] shadow-md hover:-translate-y-1 transition-all"
+                  >
+                    <div className="h-56 overflow-hidden rounded-t-[20px]">
+                      <img
+                        src={dest.image}
+                        alt={dest.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    </div>
+                    <div className="py-3 text-center text-white">
+                      <div className="font-display font-bold text-base">{dest.name}</div>
+                      <div className="text-[11px] text-[#cce1e3]">{dest.listingCount} Listing</div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
 
             {/* Pagination */}
             <div className="mt-8 flex items-center justify-center gap-2">
@@ -194,8 +211,11 @@ export function DestinationDetailPage() {
   const [revSubject, setRevSubject] = useState('');
   const [revComment, setRevComment] = useState('');
   const [submittingRev, setSubmittingRev] = useState(false);
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
+    setNotFound(false);
+    setDest(null);
     api
       .getDestination(slug)
       .then((res) => {
@@ -204,7 +224,9 @@ export function DestinationDetailPage() {
         setPricing(res.pricing);
         setSlideIdx(0);
       })
-      .catch(() => {});
+      .catch(() => {
+        setNotFound(true);
+      });
   }, [slug]);
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
@@ -230,6 +252,23 @@ export function DestinationDetailPage() {
       setSubmittingRev(false);
     }
   };
+
+  if (notFound) {
+    return (
+      <div>
+        <PageHeroBanner title="DESTINATION DETAIL" breadcrumb="Destination Detail" />
+        <div className="py-20 px-4 text-center space-y-4">
+          <p className="text-sm text-[#5d7a7f]">Destination not found.</p>
+          <Link
+            to="/destinations"
+            className="inline-block bg-[#84C400] hover:bg-[#73ac00] text-white font-semibold text-xs px-6 py-2.5 rounded-full"
+          >
+            Explore All Destinations
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (!dest) {
     return (
@@ -464,22 +503,37 @@ export function DestinationDetailPage() {
 }
 
 export function ToursListPage() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [tours, setTours] = useState<TourDTO[]>([]);
   const [popularTours, setPopularTours] = useState<TourDTO[]>([]);
   const [sort, setSort] = useState('default');
   const [bookingTour, setBookingTour] = useState<TourDTO | null>(null);
-  const [filters, setFilters] = useState<TourFiltersState>({
+  const [filters, setFilters] = useState<TourFiltersState>(() => ({
     location: searchParams.get('location') || 'All',
-    activityType: 'All',
-    date: '5 Sep 2025',
+    activityType: searchParams.get('activityType') || 'All',
+    date: searchParams.get('date') || '5 Sep 2025',
     travelers: Number(searchParams.get('travelers')) || 2,
-    cities: [],
-    maxNights: 10,
-    themes: [],
-    ratings: [],
-    amenities: [],
-  });
+    cities: searchParams.get('city')?.split(',').filter(Boolean) || [],
+    maxNights: Number(searchParams.get('maxNights')) || 10,
+    themes: searchParams.get('theme')?.split(',').filter(Boolean) || [],
+    ratings: searchParams.get('hotelRating')?.split(',').map(Number).filter((n) => !Number.isNaN(n)) || [],
+    amenities: searchParams.get('amenities')?.split(',').filter(Boolean) || [],
+  }));
+
+  useEffect(() => {
+    setFilters((prev) => ({
+      ...prev,
+      location: searchParams.get('location') || 'All',
+      activityType: searchParams.get('activityType') || 'All',
+      date: searchParams.get('date') || prev.date || '5 Sep 2025',
+      travelers: Number(searchParams.get('travelers')) || prev.travelers || 2,
+      cities: searchParams.get('city')?.split(',').filter(Boolean) || [],
+      maxNights: Number(searchParams.get('maxNights')) || 10,
+      themes: searchParams.get('theme')?.split(',').filter(Boolean) || [],
+      ratings: searchParams.get('hotelRating')?.split(',').map(Number).filter((n) => !Number.isNaN(n)) || [],
+      amenities: searchParams.get('amenities')?.split(',').filter(Boolean) || [],
+    }));
+  }, [searchParams]);
 
   const fetchFilteredTours = useCallback(() => {
     const params: Record<string, string> = {};
@@ -542,7 +596,8 @@ export function ToursListPage() {
                   <p className="text-sm text-[#4a656a]">No tours match your current filters.</p>
                   <button
                     type="button"
-                    onClick={() =>
+                    onClick={() => {
+                      setSearchParams({});
                       setFilters({
                         location: 'All',
                         activityType: 'All',
@@ -553,8 +608,8 @@ export function ToursListPage() {
                         themes: [],
                         ratings: [],
                         amenities: [],
-                      })
-                    }
+                      });
+                    }}
                     className="bg-[#094B53] text-white text-xs font-semibold px-5 py-2 rounded-full cursor-pointer"
                   >
                     Reset Filters
@@ -656,7 +711,15 @@ export function ToursListPage() {
       <BookingModal
         open={Boolean(bookingTour)}
         onClose={() => setBookingTour(null)}
-        defaultTour={bookingTour || undefined}
+        defaultTour={
+          bookingTour
+            ? {
+                ...bookingTour,
+                travelDate: filters.date || bookingTour.travelDate,
+                travelers: filters.travelers,
+              }
+            : undefined
+        }
       />
     </div>
   );
@@ -666,31 +729,53 @@ export function TourDetailPage() {
   const { slug = 'bali-indonesia' } = useParams();
   const navigate = useNavigate();
   const [tour, setTour] = useState<TourDTO | null>(null);
+  const [notFound, setNotFound] = useState(false);
   const [slideIdx, setSlideIdx] = useState(0);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [videoOpen, setVideoOpen] = useState(false);
-  const [travelers, setTravelers] = useState(5);
+  const [travelers, setTravelers] = useState(2);
   const [filters, setFilters] = useState<TourFiltersState>({
-    location: 'Bali',
-    activityType: 'Adventure',
+    location: 'All',
+    activityType: 'All',
     date: '5 Sep 2025',
-    travelers: 5,
-    cities: ['New York'],
+    travelers: 2,
+    cities: [],
     maxNights: 10,
-    themes: ['Wild life'],
-    ratings: [3],
-    amenities: ['Reservations'],
+    themes: [],
+    ratings: [],
+    amenities: [],
   });
 
   useEffect(() => {
+    setNotFound(false);
+    setTour(null);
     api
       .getTour(slug)
       .then((r) => {
         setTour(r.tour);
         setSlideIdx(0);
       })
-      .catch(() => {});
+      .catch(() => {
+        setNotFound(true);
+      });
   }, [slug]);
+
+  if (notFound) {
+    return (
+      <div>
+        <PageHeroBanner title="TOUR DETAIL" breadcrumb="Tour Detail" />
+        <div className="py-20 px-4 text-center space-y-4">
+          <p className="text-sm text-[#5d7a7f]">Tour package not found.</p>
+          <Link
+            to="/tours"
+            className="inline-block bg-[#84C400] hover:bg-[#73ac00] text-white font-semibold text-xs px-6 py-2.5 rounded-full"
+          >
+            Browse All Tours
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (!tour) {
     return (
@@ -703,6 +788,20 @@ export function TourDetailPage() {
 
   const slides = tour.gallery?.length ? tour.gallery : [tour.image];
 
+  const handleSidebarSearch = () => {
+    const sp = new URLSearchParams();
+    if (filters.location && filters.location !== 'All') sp.set('location', filters.location);
+    if (filters.activityType && filters.activityType !== 'All') sp.set('activityType', filters.activityType);
+    if (filters.date) sp.set('date', filters.date);
+    if (filters.travelers) sp.set('travelers', String(filters.travelers));
+    if (filters.cities.length) sp.set('city', filters.cities.join(','));
+    if (filters.maxNights < 10) sp.set('maxNights', String(filters.maxNights));
+    if (filters.themes.length) sp.set('theme', filters.themes.join(','));
+    if (filters.ratings.length) sp.set('hotelRating', filters.ratings.join(','));
+    if (filters.amenities.length) sp.set('amenities', filters.amenities.join(','));
+    navigate(`/tours?${sp.toString()}`);
+  };
+
   return (
     <div>
       <PageHeroBanner title="TOUR DETAIL" breadcrumb="Tour Detail" />
@@ -713,7 +812,7 @@ export function TourDetailPage() {
             <TourFilterSidebar
               filters={filters}
               onChange={setFilters}
-              onSearchSubmit={() => navigate(`/tours?location=${encodeURIComponent(filters.location)}`)}
+              onSearchSubmit={handleSidebarSearch}
               showPromoCard
               onPromoClick={() => setBookingOpen(true)}
             />
@@ -948,6 +1047,7 @@ export function TourDetailPage() {
           activityType: tour.activityType,
           pricePerDay: tour.pricePerDay,
           travelDate: tour.travelDate,
+          travelers,
         }}
       />
     </div>

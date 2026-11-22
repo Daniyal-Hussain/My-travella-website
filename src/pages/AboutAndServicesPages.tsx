@@ -20,6 +20,7 @@ import { BlogDestSidebar } from '../components/Sidebars';
 export function AboutPage() {
   const [testimonials, setTestimonials] = useState<TestimonialDTO[]>([]);
   const [services, setServices] = useState<ServiceDTO[]>([]);
+  const [destOffset, setDestOffset] = useState(0);
 
   useEffect(() => {
     api.getTestimonials().then((r) => setTestimonials(r.testimonials)).catch(() => {});
@@ -33,6 +34,10 @@ export function AboutPage() {
     { name: 'Thailand', image: ASSETS.thailandCliff, active: false, slug: 'thailand' },
   ];
 
+  const orderedDestinations = popularDestinations.map(
+    (_, idx) => popularDestinations[(destOffset + idx) % popularDestinations.length],
+  );
+
   return (
     <div>
       <PageHeroBanner title="ABOUT US" breadcrumb="About Us" />
@@ -45,7 +50,7 @@ export function AboutPage() {
           <SectionHeading prefix="Popular" highlight="Destination" />
 
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {popularDestinations.map((d) => (
+            {orderedDestinations.map((d) => (
               <Link
                 key={d.name}
                 to={`/destinations/${d.slug}`}
@@ -70,12 +75,22 @@ export function AboutPage() {
           </div>
 
           <div className="mt-8 flex items-center justify-center gap-3">
-            <span className="w-9 h-9 rounded-full bg-[#F5A623] text-white flex items-center justify-center">
+            <button
+              type="button"
+              onClick={() => setDestOffset((v) => (v - 1 + popularDestinations.length) % popularDestinations.length)}
+              aria-label="Previous destination"
+              className="w-9 h-9 rounded-full bg-[#F5A623] hover:bg-[#e09314] text-white flex items-center justify-center cursor-pointer transition-colors"
+            >
               <ArrowLeft className="w-4 h-4" />
-            </span>
-            <span className="w-9 h-9 rounded-full bg-white text-[#094B53] flex items-center justify-center border border-[#d7ebee]">
+            </button>
+            <button
+              type="button"
+              onClick={() => setDestOffset((v) => (v + 1) % popularDestinations.length)}
+              aria-label="Next destination"
+              className="w-9 h-9 rounded-full bg-white hover:bg-[#eef7f8] text-[#094B53] flex items-center justify-center border border-[#d7ebee] cursor-pointer transition-colors"
+            >
               <ArrowRight className="w-4 h-4" />
-            </span>
+            </button>
           </div>
         </div>
       </section>
@@ -152,8 +167,11 @@ export function ServiceDetailPage() {
   const [service, setService] = useState<ServiceDTO | null>(null);
   const [allServices, setAllServices] = useState<Array<{ slug: string; title: string }>>([]);
   const [openFaq, setOpenFaq] = useState<number>(0);
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
+    setNotFound(false);
+    setService(null);
     api
       .getService(slug)
       .then((res) => {
@@ -161,8 +179,27 @@ export function ServiceDetailPage() {
         setAllServices(res.allServices);
         setOpenFaq(0);
       })
-      .catch(() => {});
+      .catch(() => {
+        setNotFound(true);
+      });
   }, [slug]);
+
+  if (notFound) {
+    return (
+      <div>
+        <PageHeroBanner title="SERVICE DETAIL" breadcrumb="Service Detail" />
+        <div className="py-20 px-4 text-center space-y-4">
+          <p className="text-sm text-[#5d7a7f]">Requested service was not found.</p>
+          <Link
+            to="/services"
+            className="inline-block bg-[#84C400] hover:bg-[#73ac00] text-white font-semibold text-xs px-6 py-2.5 rounded-full"
+          >
+            Back to All Services
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (!service) {
     return (

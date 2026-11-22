@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { MessageCircle } from 'lucide-react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import { Footer } from './components/Footer';
 import { Navbar } from './components/Navbar';
@@ -67,6 +68,18 @@ export default function App() {
         </Routes>
       </main>
       <Footer />
+
+      {/* Floating WhatsApp Quick Chat Button */}
+      <a
+        href="https://wa.me/923554588258"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Chat on WhatsApp 0355-4588258"
+        className="fixed bottom-4 right-4 z-40 inline-flex items-center gap-2 rounded-full bg-[#25D366] hover:bg-[#1ebe5d] text-white px-3.5 py-2.5 shadow-xl border border-white/40 transition-transform hover:scale-105 active:scale-95"
+      >
+        <MessageCircle className="w-5 h-5 fill-current" />
+        <span className="hidden sm:inline text-xs font-bold tracking-tight">0355-4588258</span>
+      </a>
     </div>
   );
 }

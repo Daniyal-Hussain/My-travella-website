@@ -17,6 +17,16 @@ import {
 
 export const apiRouter = Router();
 
+function escapeRegex(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function buildLocationPattern(raw: string): string {
+  const cleaned = raw.replace(/,/g, ' ').replace(/\s+/g, ' ').trim();
+  const tokens = cleaned.split(' ').filter(Boolean).map(escapeRegex);
+  return tokens.join('[\\s,]*');
+}
+
 apiRouter.get('/health', (_req, res) => {
   const readyState = mongoose.connection.readyState;
   res.status(readyState === 1 ? 200 : 503).json({
@@ -51,14 +61,15 @@ apiRouter.get('/destinations', async (req, res, next) => {
       filter.continent = continent;
     }
     if (typeof q === 'string' && q.trim()) {
+      const safeQ = escapeRegex(q.trim());
       filter.$or = [
-        { name: { $regex: q.trim(), $options: 'i' } },
-        { country: { $regex: q.trim(), $options: 'i' } },
-        { summary: { $regex: q.trim(), $options: 'i' } },
+        { name: { $regex: safeQ, $options: 'i' } },
+        { country: { $regex: safeQ, $options: 'i' } },
+        { summary: { $regex: safeQ, $options: 'i' } },
       ];
     }
     if (typeof tag === 'string' && tag.trim()) {
-      filter.summary = { $regex: tag.trim(), $options: 'i' };
+      filter.summary = { $regex: escapeRegex(tag.trim()), $options: 'i' };
     }
     const items = await DestinationModel.find(filter).lean();
     res.json({ destinations: items });
@@ -125,21 +136,33 @@ apiRouter.get('/tours', async (req, res, next) => {
     } = req.query;
 
     const filter: Record<string, unknown> = {};
+    const andConditions: Array<Record<string, unknown>> = [];
 
     if (typeof location === 'string' && location.trim() && location !== 'All') {
-      filter.$or = [
-        { location: { $regex: location.trim(), $options: 'i' } },
-        { city: { $regex: location.trim(), $options: 'i' } },
-        { title: { $regex: location.trim(), $options: 'i' } },
-      ];
+      const locPattern = buildLocationPattern(location);
+      const firstToken = escapeRegex(location.split(',')[0].trim());
+      andConditions.push({
+        $or: [
+          { location: { $regex: locPattern, $options: 'i' } },
+          { city: { $regex: locPattern, $options: 'i' } },
+          { title: { $regex: locPattern, $options: 'i' } },
+          ...(firstToken ? [{ location: { $regex: firstToken, $options: 'i' } }, { title: { $regex: firstToken, $options: 'i' } }] : []),
+        ],
+      });
     }
     if (typeof search === 'string' && search.trim()) {
-      filter.$or = [
-        { location: { $regex: search.trim(), $options: 'i' } },
-        { city: { $regex: search.trim(), $options: 'i' } },
-        { title: { $regex: search.trim(), $options: 'i' } },
-        { shortDesc: { $regex: search.trim(), $options: 'i' } },
-      ];
+      const safeSearch = escapeRegex(search.trim());
+      andConditions.push({
+        $or: [
+          { location: { $regex: safeSearch, $options: 'i' } },
+          { city: { $regex: safeSearch, $options: 'i' } },
+          { title: { $regex: safeSearch, $options: 'i' } },
+          { shortDesc: { $regex: safeSearch, $options: 'i' } },
+        ],
+      });
+    }
+    if (andConditions.length > 0) {
+      filter.$and = andConditions;
     }
     if (typeof city === 'string' && city.trim()) {
       const cities = city.split(',').map((c) => c.trim()).filter(Boolean);
@@ -226,7 +249,7 @@ apiRouter.post('/bookings', async (req, res, next) => {
     const numTravelers = Math.max(1, Number(travelers) || 1);
     const rate = Math.max(1, Number(pricePerDay) || 59);
     const totalEstimate = rate * numTravelers;
-    const bookingRef = `TRV-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
+    const bookingRef = `TN-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
 
     const booking = await BookingModel.create({
       bookingRef,
@@ -300,14 +323,15 @@ apiRouter.get('/blogs', async (req, res, next) => {
     const { q, tag } = req.query;
     const filter: Record<string, unknown> = {};
     if (typeof q === 'string' && q.trim()) {
+      const safeQ = escapeRegex(q.trim());
       filter.$or = [
-        { title: { $regex: q.trim(), $options: 'i' } },
-        { author: { $regex: q.trim(), $options: 'i' } },
-        { excerpt: { $regex: q.trim(), $options: 'i' } },
+        { title: { $regex: safeQ, $options: 'i' } },
+        { author: { $regex: safeQ, $options: 'i' } },
+        { excerpt: { $regex: safeQ, $options: 'i' } },
       ];
     }
     if (typeof tag === 'string' && tag.trim()) {
-      filter.tags = { $regex: `^${tag.trim()}$`, $options: 'i' };
+      filter.tags = { $regex: `^${escapeRegex(tag.trim())}$`, $options: 'i' };
     }
     const blogs = await BlogPostModel.find(filter).lean();
     res.json({ blogs });

@@ -19,7 +19,7 @@ function ensureDatabaseReady() {
     dbInitPromise = (async () => {
       const conn = await connectMongoDB();
       await seedDatabase();
-      console.log(`Travlla MongoDB connected (${conn.mode}) & seeded`);
+      console.log(`TourNaure MongoDB connected (${conn.mode}) & seeded`);
       return conn;
     })().catch((err) => {
       dbInitPromise = null;
@@ -97,7 +97,7 @@ async function startServer() {
   });
 
   const server = app.listen(PORT, HOST, () => {
-    console.log(`Travlla MERN server listening on http://${HOST}:${PORT}`);
+    console.log(`TourNaure MERN server listening on http://${HOST}:${PORT}`);
   });
 
   const shutdown = async () => {
@@ -110,6 +110,6 @@ async function startServer() {
 }
 
 startServer().catch((err) => {
-  console.error('Failed to start Travlla server:', err);
+  console.error('Failed to start TourNaure server:', err);
   process.exit(1);
 });

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, MapPin, Phone, Search } from 'lucide-react';
+import { Mail, MapPin, MessageCircle, Phone, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../lib/api';
 import { ASSETS } from '../lib/images';
@@ -32,9 +32,9 @@ export function Footer() {
     try {
       const res = await api.subscribeNewsletter(email.trim());
       if (res.alreadySubscribed) {
-        toast.success('You are already subscribed to Travlla weekly updates!');
+        toast.success('You are already subscribed to TourNaure weekly updates!');
       } else {
-        toast.success('Welcome aboard! You are subscribed to Travlla updates.');
+        toast.success('Welcome aboard! You are subscribed to TourNaure updates.');
       }
       setEmail('');
     } catch (err) {
@@ -100,7 +100,7 @@ export function Footer() {
                 <TravllaLogo variant="dark" />
               </Link>
               <p className="mt-4 text-[12.5px] leading-relaxed text-[#cce1e3]">
-                Travlla is a multi-award-winning strategy and content creation agency that specializes in travel marketing.
+                TourNaure is a multi-award-winning strategy and content creation agency that specializes in travel marketing.
               </p>
               <div className="mt-5 flex items-center gap-2.5">
                 {[
@@ -158,24 +158,41 @@ export function Footer() {
             </div>
 
             {/* Contact Column */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <span className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center shrink-0">
+            <div className="space-y-3.5">
+              <a href="tel:03554588258" className="flex items-center gap-3 group">
+                <span className="w-8 h-8 rounded-full bg-white/15 group-hover:bg-[#F5A623] flex items-center justify-center shrink-0 transition-colors">
                   <Phone className="w-3.5 h-3.5 text-white" />
                 </span>
-                <span className="font-script italic text-2xl text-[#F5A623] font-bold">123 654 0214</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center shrink-0">
+                <span className="font-script italic text-2xl text-[#F5A623] font-bold">03554588258</span>
+              </a>
+              <a
+                href="https://wa.me/923554588258"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 group"
+              >
+                <span className="w-8 h-8 rounded-full bg-[#25D366]/20 group-hover:bg-[#25D366] flex items-center justify-center shrink-0 transition-colors">
+                  <MessageCircle className="w-3.5 h-3.5 text-[#25D366] group-hover:text-white" />
+                </span>
+                <span className="text-[12.5px] text-[#cce1e3] group-hover:text-white transition-colors">
+                  WhatsApp: 0355-4588258
+                </span>
+              </a>
+              <a href="mailto:gbtournature@gmail.com" className="flex items-center gap-3 group">
+                <span className="w-8 h-8 rounded-full bg-white/15 group-hover:bg-[#F5A623] flex items-center justify-center shrink-0 transition-colors">
                   <Mail className="w-3.5 h-3.5 text-white" />
                 </span>
-                <span className="text-[12.5px] text-[#cce1e3]">travllainfo@gmail.com</span>
-              </div>
-              <div className="flex items-center gap-3">
+                <span className="text-[12.5px] text-[#cce1e3] group-hover:text-white break-all transition-colors">
+                  gbtournature@gmail.com
+                </span>
+              </a>
+              <div className="flex items-start gap-3">
                 <span className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center shrink-0">
                   <MapPin className="w-3.5 h-3.5 text-white" />
                 </span>
-                <span className="text-[12.5px] text-[#cce1e3]">55/11 ronin tower New York</span>
+                <span className="text-[12.5px] text-[#cce1e3] leading-snug">
+                  New Rangah Chief court Area Skardu
+                </span>
               </div>
             </div>
           </div>
@@ -190,7 +207,7 @@ export function Footer() {
                   to="/gallery"
                   className="aspect-square rounded-xl overflow-hidden border border-white/15 hover:scale-105 transition-transform"
                 >
-                  <img src={src} alt={`Travlla moment ${idx + 1}`} className="w-full h-full object-cover" />
+                  <img src={src} alt={`TourNaure moment ${idx + 1}`} className="w-full h-full object-cover" />
                 </Link>
               ))}
             </div>
@@ -198,7 +215,7 @@ export function Footer() {
 
           {/* Copyright */}
           <div className="pt-4 border-t border-white/10 text-center text-[11.5px] text-[#cce1e3]">
-            © 2025 <span className="text-[#F5A623] font-semibold">TRAVLLA</span> All Rights Reserved.
+            © 2025 <span className="text-[#F5A623] font-semibold">TourNaure</span> All Rights Reserved.
           </div>
         </div>
       </section>

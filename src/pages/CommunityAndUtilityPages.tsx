@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
-import { CheckCircle2, ChevronDown, Mail, MapPin, Phone, Quote } from 'lucide-react';
+import { CheckCircle2, ChevronDown, Mail, MapPin, MessageCircle, Phone, Quote } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   api,
@@ -64,7 +64,7 @@ export function FaqPage() {
               Find <span className="text-[#F5A623]">Answers</span> for Questions You Have.
             </h2>
             <p className="mt-2 text-xs text-[#5d7a7f] max-w-sm mx-auto lg:mx-0">
-              Travlla is a multi-award-winning travel coordination agency dedicated to smooth planning before every departure.
+              TourNaure is a multi-award-winning travel coordination agency dedicated to smooth planning before every departure.
             </p>
 
             <div className="mt-6 relative max-w-[280px] mx-auto lg:mx-0">
@@ -204,15 +204,20 @@ export function GalleryPage() {
 }
 
 export function BlogGridPage() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [blogs, setBlogs] = useState<BlogPostDTO[]>([]);
   const [page, setPage] = useState(1);
 
+  const q = searchParams.get('q') || '';
+  const tag = searchParams.get('tag') || '';
+
   useEffect(() => {
-    const q = searchParams.get('q') || undefined;
-    const tag = searchParams.get('tag') || undefined;
-    api.getBlogs({ q, tag }).then((r) => setBlogs(r.blogs)).catch(() => {});
-  }, [searchParams]);
+    setPage(1);
+    api
+      .getBlogs({ q: q || undefined, tag: tag || undefined })
+      .then((r) => setBlogs(r.blogs))
+      .catch(() => {});
+  }, [q, tag]);
 
   const perPage = 9;
   const paged = blogs.slice((page - 1) * perPage, page * perPage);
@@ -224,32 +229,62 @@ export function BlogGridPage() {
 
       <section className="py-16 px-4 bg-[#F6FCFC]">
         <div className="max-w-[1040px] mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {paged.map((post) => (
-              <Link
-                key={post.slug}
-                to={`/blog/${post.slug}`}
-                className="group relative h-72 rounded-3xl overflow-hidden shadow-md block"
+          {(q || tag) && (
+            <div className="mb-6 flex flex-wrap items-center justify-between gap-3 bg-white border border-[#d7ebee] rounded-2xl px-4 py-3 text-xs text-[#094B53]">
+              <span>
+                Showing articles{' '}
+                {q ? <>matching &ldquo;<strong>{q}</strong>&rdquo; </> : null}
+                {tag ? <>tagged <strong>#{tag}</strong></> : null}
+              </span>
+              <button
+                type="button"
+                onClick={() => setSearchParams({})}
+                className="text-[#F5A623] font-bold hover:underline cursor-pointer"
               >
-                <img
-                  src={post.image}
-                  alt={post.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
-                <div className="absolute top-3.5 right-3.5 bg-white text-[#094B53] rounded-xl px-2.5 py-1.5 text-center leading-tight shadow">
-                  <div className="font-display font-extrabold text-sm">{post.dateDay}</div>
-                  <div className="text-[9px] font-bold uppercase text-[#5d7a7f]">{post.dateMonth}</div>
-                </div>
-                <div className="absolute bottom-4 left-4 right-4 text-white">
-                  <div className="text-[11px] font-semibold text-[#F5A623]">By {post.author}</div>
-                  <h3 className="font-display font-bold text-sm leading-snug mt-1 group-hover:text-[#F5A623] transition-colors">
-                    {post.title}
-                  </h3>
-                </div>
-              </Link>
-            ))}
-          </div>
+                Clear Filter
+              </button>
+            </div>
+          )}
+
+          {paged.length === 0 ? (
+            <div className="bg-white rounded-3xl border border-[#d7ebee] p-10 text-center space-y-3">
+              <p className="text-sm text-[#4a656a]">No blog articles matched your search.</p>
+              <button
+                type="button"
+                onClick={() => setSearchParams({})}
+                className="bg-[#094B53] text-white text-xs font-semibold px-5 py-2 rounded-full cursor-pointer"
+              >
+                View All Articles
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {paged.map((post) => (
+                <Link
+                  key={post.slug}
+                  to={`/blog/${post.slug}`}
+                  className="group relative h-72 rounded-3xl overflow-hidden shadow-md block"
+                >
+                  <img
+                    src={post.image}
+                    alt={post.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
+                  <div className="absolute top-3.5 right-3.5 bg-white text-[#094B53] rounded-xl px-2.5 py-1.5 text-center leading-tight shadow">
+                    <div className="font-display font-extrabold text-sm">{post.dateDay}</div>
+                    <div className="text-[9px] font-bold uppercase text-[#5d7a7f]">{post.dateMonth}</div>
+                  </div>
+                  <div className="absolute bottom-4 left-4 right-4 text-white">
+                    <div className="text-[11px] font-semibold text-[#F5A623]">By {post.author}</div>
+                    <h3 className="font-display font-bold text-sm leading-snug mt-1 group-hover:text-[#F5A623] transition-colors">
+                      {post.title}
+                    </h3>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
 
           <div className="mt-10 flex items-center justify-center gap-2">
             <button
@@ -290,6 +325,7 @@ export function BlogGridPage() {
 export function BlogDetailPage() {
   const { slug = 'thailand-global-tourism-routes' } = useParams();
   const [post, setPost] = useState<BlogPostDTO | null>(null);
+  const [notFound, setNotFound] = useState(false);
   const [cName, setCName] = useState('');
   const [cEmail, setCEmail] = useState('');
   const [cSubject, setCSubject] = useState('');
@@ -297,7 +333,12 @@ export function BlogDetailPage() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    api.getBlog(slug).then((r) => setPost(r.post)).catch(() => {});
+    setNotFound(false);
+    setPost(null);
+    api
+      .getBlog(slug)
+      .then((r) => setPost(r.post))
+      .catch(() => setNotFound(true));
   }, [slug]);
 
   const handleComment = async (e: React.FormEvent) => {
@@ -318,6 +359,23 @@ export function BlogDetailPage() {
       setSubmitting(false);
     }
   };
+
+  if (notFound) {
+    return (
+      <div>
+        <PageHeroBanner title="BLOG DETAIL" breadcrumb="Detail" />
+        <div className="py-20 px-4 text-center space-y-4">
+          <p className="text-sm text-[#5d7a7f]">Article not found.</p>
+          <Link
+            to="/blog"
+            className="inline-block bg-[#84C400] hover:bg-[#73ac00] text-white font-semibold text-xs px-6 py-2.5 rounded-full"
+          >
+            Back to All Articles
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (!post) {
     return (
@@ -496,16 +554,36 @@ export function TourGuideDetailPage() {
   const { slug = 'ricardo-murphy' } = useParams();
   const [guide, setGuide] = useState<TourGuideDTO | null>(null);
   const [allGuides, setAllGuides] = useState<TourGuideDTO[]>([]);
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
+    setNotFound(false);
+    setGuide(null);
     api
       .getGuide(slug)
       .then((r) => {
         setGuide(r.guide);
         setAllGuides(r.allGuides);
       })
-      .catch(() => {});
+      .catch(() => setNotFound(true));
   }, [slug]);
+
+  if (notFound) {
+    return (
+      <div>
+        <PageHeroBanner title="TOUR GUIDE DETAIL" breadcrumb="Tour Guide Detail" />
+        <div className="py-20 px-4 text-center space-y-4">
+          <p className="text-sm text-[#5d7a7f]">Guide profile not found.</p>
+          <Link
+            to="/guides/ricardo-murphy"
+            className="inline-block bg-[#84C400] hover:bg-[#73ac00] text-white font-semibold text-xs px-6 py-2.5 rounded-full"
+          >
+            View Lead Guide
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (!guide) {
     return (
@@ -690,7 +768,11 @@ export function ContactPage() {
 
       <section className="py-14 px-4 bg-[#F6FCFC]">
         <div className="max-w-[1060px] mx-auto bg-white rounded-[36px] p-6 md:p-10 shadow-xl border border-[#e3f1f3] space-y-10">
-          <InteractiveLocationMap heightClass="h-[300px] md:h-[360px]" />
+          <InteractiveLocationMap
+            address="New Rangah Chief court Area Skardu"
+            label="TourNaure Office — Skardu"
+            heightClass="h-[300px] md:h-[360px]"
+          />
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             {/* Left Warm Cream Form */}
@@ -749,37 +831,59 @@ export function ContactPage() {
                   Contact <span className="text-[#F5A623]">Detail</span>
                 </h2>
                 <p className="text-xs text-[#5d7a7f] mt-1 max-w-sm">
-                  Travlla is a multi-award-winning strategy and content creation agency that specializes in travel coordination.
+                  TourNaure is a multi-award-winning strategy and content creation agency that specializes in travel coordination.
                 </p>
               </div>
 
               <div className="flex flex-col sm:flex-row items-center gap-6">
                 <div className="space-y-4 flex-1">
-                  <div className="flex items-center gap-3.5">
+                  <a href="tel:03554588258" className="flex items-center gap-3.5 group">
                     <span className="w-10 h-10 rounded-full bg-[#3E93A6] text-white flex items-center justify-center shrink-0">
                       <Phone className="w-4 h-4" />
                     </span>
                     <div>
                       <div className="text-[11px] text-[#5d7a7f]">Phone</div>
-                      <div className="font-display font-bold text-sm text-[#094B53]">123 654 0214</div>
+                      <div className="font-display font-bold text-sm text-[#094B53] group-hover:text-[#F5A623] transition-colors">
+                        03554588258
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-3.5">
+                  </a>
+                  <a
+                    href="https://wa.me/923554588258"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3.5 group"
+                  >
+                    <span className="w-10 h-10 rounded-full bg-[#25D366] text-white flex items-center justify-center shrink-0">
+                      <MessageCircle className="w-4 h-4" />
+                    </span>
+                    <div>
+                      <div className="text-[11px] text-[#5d7a7f]">WhatsApp</div>
+                      <div className="font-display font-bold text-sm text-[#094B53] group-hover:text-[#25D366] transition-colors">
+                        0355-4588258
+                      </div>
+                    </div>
+                  </a>
+                  <a href="mailto:gbtournature@gmail.com" className="flex items-center gap-3.5 group">
                     <span className="w-10 h-10 rounded-full bg-[#D98892] text-white flex items-center justify-center shrink-0">
                       <Mail className="w-4 h-4" />
                     </span>
                     <div>
                       <div className="text-[11px] text-[#5d7a7f]">Email</div>
-                      <div className="font-display font-bold text-sm text-[#094B53]">travllainfo@gmail.com</div>
+                      <div className="font-display font-bold text-sm text-[#094B53] group-hover:text-[#F5A623] transition-colors break-all">
+                        gbtournature@gmail.com
+                      </div>
                     </div>
-                  </div>
+                  </a>
                   <div className="flex items-center gap-3.5">
                     <span className="w-10 h-10 rounded-full bg-[#094B53] text-white flex items-center justify-center shrink-0">
                       <MapPin className="w-4 h-4" />
                     </span>
                     <div>
-                      <div className="text-[11px] text-[#5d7a7f]">Address</div>
-                      <div className="font-display font-bold text-sm text-[#094B53]">55/11 ronin tower, New York</div>
+                      <div className="text-[11px] text-[#5d7a7f]">Location</div>
+                      <div className="font-display font-bold text-sm text-[#094B53]">
+                        New Rangah Chief court Area Skardu
+                      </div>
                     </div>
                   </div>
                 </div>

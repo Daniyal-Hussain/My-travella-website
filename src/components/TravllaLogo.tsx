@@ -13,7 +13,7 @@ export function TravllaLogo({ variant = 'light', compact = false, className = ''
     <span className={`inline-flex items-center justify-center select-none ${className}`}>
       <img
         src={src}
-        alt="N Tour Nature"
+        alt="TourNaure"
         className={`w-auto object-contain shrink-0 ${
           compact ? 'h-12 sm:h-[54px]' : 'h-20 sm:h-24'
         }`}

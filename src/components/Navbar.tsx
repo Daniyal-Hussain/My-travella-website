@@ -15,6 +15,7 @@ import {
   Mail,
   MapPin,
   Menu,
+  MessageCircle,
   PanelLeftClose,
   Phone,
   Search,
@@ -105,6 +106,18 @@ export function Navbar() {
     handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpenMenu(null);
+        setDrawerOpen(false);
+        setSearchOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   useEffect(() => {
@@ -575,7 +588,7 @@ export function Navbar() {
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5">
                     <span className="font-display font-bold text-[12.5px] text-white truncate">
-                      N Tour Nature
+                      TourNaure
                     </span>
                     <span className="bg-white/90 text-[#094B53] text-[8.5px] font-extrabold px-1.5 py-0.5 rounded-md tracking-wide uppercase">
                       Pro
@@ -744,18 +757,20 @@ export function Navbar() {
                 <ChevronRight className="w-3.5 h-3.5 text-white/55" />
               </Link>
 
-              <div className="px-2 py-0.5 flex items-center justify-between text-[10.5px] text-white/75">
-                <span className="inline-flex items-center gap-1.5">
+              <div className="px-2 py-0.5 flex flex-wrap items-center justify-between gap-2 text-[10.5px] text-white/75">
+                <a href="tel:03554588258" className="inline-flex items-center gap-1.5 hover:text-white">
                   <Phone className="w-3 h-3 text-[#7fffe8]" />
-                  123 654 0214
-                </span>
-                <Link
-                  to="/404"
-                  onClick={() => setDrawerOpen(false)}
-                  className="text-white/60 hover:text-white underline-offset-2 hover:underline"
+                  03554588258
+                </a>
+                <a
+                  href="https://wa.me/923554588258"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-[#86efac] hover:text-white"
                 >
-                  404 Page
-                </Link>
+                  <MessageCircle className="w-3 h-3" />
+                  0355-4588258
+                </a>
               </div>
             </div>
           </aside>

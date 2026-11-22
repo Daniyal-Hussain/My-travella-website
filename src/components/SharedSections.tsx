@@ -107,7 +107,7 @@ export function EasyStepsSection() {
               Easy <span className="text-[#F5A623]">Steps</span> For Booking
             </h2>
             <p className="mt-2 text-xs md:text-[13px] leading-relaxed text-[#5d7a7f]">
-              Choosing a destination can be exciting but also a bit overwhelming with so many amazing places out there! Let’s narrow it down—Travlla specializes in crafting effortless curated journeys.
+              Choosing a destination can be exciting but also a bit overwhelming with so many amazing places out there! Let’s narrow it down—TourNaure specializes in crafting effortless curated journeys.
             </p>
           </div>
           <Link
@@ -268,7 +268,7 @@ export function RecommendDestinationsSection() {
                 We <span className="text-[#F5A623]">Recommend</span> Beautiful Destinations Every Month
               </h2>
               <p className="mt-3 text-xs md:text-[13px] leading-relaxed text-[#5d7a7f]">
-                Travlla is a multi-award-winning strategy and travel curation agency helping global explorers discover authentic cultures, alpine trails, and beachfront sanctuaries safely.
+                TourNaure is a multi-award-winning strategy and travel curation agency helping global explorers discover authentic cultures, alpine trails, and beachfront sanctuaries safely.
               </p>
 
               <div className="mt-6 space-y-3.5">
@@ -831,8 +831,8 @@ export function GalleryBentoGrid({ items }: { items: GalleryItemDTO[] }) {
 }
 
 export function InteractiveLocationMap({
-  address = '853 W Blackhawk St, Chicago, IL 60642, USA',
-  label = 'Travlla Regional Hub',
+  address = 'New Rangah Chief court Area Skardu',
+  label = 'TourNaure Main Office',
   heightClass = 'h-[310px]',
 }: {
   address?: string;
@@ -858,11 +858,11 @@ export function InteractiveLocationMap({
         <path d="M0 270 Q340 230 800 280" stroke="#ffffff" strokeWidth="10" fill="none" />
         <path d="M640 40 L760 40 L750 180 L610 150 Z" fill="#dcecd8" />
         <path d="M180 210 C220 190 280 205 310 245 C270 285 200 275 180 210 Z" fill="#cde5f0" />
-        <text x="80" y="95" fill="#7c877c" fontSize="11" fontFamily="sans-serif">Trail</text>
-        <text x="275" y="90" fill="#7c877c" fontSize="11" fontFamily="sans-serif">Shady Cove</text>
-        <text x="415" y="190" fill="#7c877c" fontSize="11" fontFamily="sans-serif">Lake of the Woods</text>
-        <text x="580" y="210" fill="#7c877c" fontSize="11" fontFamily="sans-serif">Klamath</text>
-        <text x="320" y="295" fill="#7c877c" fontSize="11" fontFamily="sans-serif">Ashland</text>
+        <text x="80" y="95" fill="#7c877c" fontSize="11" fontFamily="sans-serif">Yadgar Chowk</text>
+        <text x="275" y="90" fill="#7c877c" fontSize="11" fontFamily="sans-serif">Chief Court Road</text>
+        <text x="415" y="190" fill="#7c877c" fontSize="11" fontFamily="sans-serif">New Rangah</text>
+        <text x="580" y="210" fill="#7c877c" fontSize="11" fontFamily="sans-serif">Skardu Valley</text>
+        <text x="320" y="295" fill="#7c877c" fontSize="11" fontFamily="sans-serif">Indus Riverside</text>
       </svg>
 
       {/* Top Left Google-Style Place Card */}
